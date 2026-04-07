@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build">
+  <Sdk Name="Microsoft.Build.Sql" Version="2.1.0" />
+  <PropertyGroup>
+    <Name>MyDatabaseProjectUno</Name>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql160DatabaseSchemaProvider</DSP>
+    <ModelCollation>1033, CI</ModelCollation>
+    <ProjectGuid>6FB2A9BA-D1DD-44CB-9C98-89AD737EADB2</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup>
+    <PreDeploy Include="PreDeploy.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="PostDeploy.sql" />
+</ItemGroup>
+<ItemGroup>
+    <Build Remove="Scripts\PreDeployment\populate.sql" />
+    <None Include="Scripts\PreDeployment\populate.sql" />
+  </ItemGroup>
+
+</Project>
