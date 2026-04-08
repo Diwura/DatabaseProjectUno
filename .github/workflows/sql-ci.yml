@@ -1,0 +1,51 @@
+name: SQL_CI
+
+on:
+    pull_request:
+        branches: [ main ]
+        
+jobs:
+    build-and-validate: # job_id
+     name: Build and validate dacpac # job name
+     runs-on: windows-latest
+
+     steps:
+        - name: Checkout code from github repository
+          uses: actions/checkout@v4
+
+        - name: Setup .Net
+          uses: actions/setup-dotnet@v4
+          with:
+            dotnet-version: 8.0.x
+        - name: Restore tools
+          run: dotnet tool restore
+          shell: pwsh
+
+        - name: Build SQL project
+          run: dotnet build MyDatabaseProjectUno/MyDatabaseProjectUno.sqlproj -c Release
+          shell: pwsh
+        
+        - name: Install SQLPackage
+          run: dotnet tool install --global Microsoft.SqlPackage
+          shell: pwsh
+
+        - name: Generate deploy script against Dev
+          run: >
+           sqlpackage
+           /Action:Script
+           /SourceFile:"MyDatabaseProjectUno\bin\Debug\MyDatabaseProjectUno.dacpac"
+           /TargetConnectionString:"Server=${{ secrets.SQL_SERVER }};Database=${{ secrets.DEV_DB_NAME }};User ID=${{ secrets.SQL_USER }};Password=${{ secrets.SQL_PASSWORD }};Encrypt=True;TrustServerCertificate=True"
+           /OutputPath:"deploy-script.sql"
+          shell: pwsh
+
+        - name: Upload dacpac
+          uses: actions/upload-artifact@v4
+          with:
+            name: dacpac
+            path: MyDatabaseProjectUno/bin/Debug/MyDatabaseProjectUno.dacpac
+
+        - name : Upload deploy script
+          uses: actions/upload-artifact@v4
+          with:
+            name: deploy-script
+            path: deploy-script.sql 
