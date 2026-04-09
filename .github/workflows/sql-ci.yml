@@ -21,6 +21,8 @@ jobs:
 
         - name: Checkout code from github repository
           uses: actions/checkout@v4
+          with:
+            clean: false
 
         - name: Setup .Net
           uses: actions/setup-dotnet@v4
