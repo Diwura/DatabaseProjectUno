@@ -30,6 +30,14 @@ jobs:
           run: dotnet tool install --global Microsoft.SqlPackage
           shell: pwsh
 
+        - name: Test SQL Server connectivity
+          run: |
+            Write-Host "Testing connection to localhost:1433"
+            Test-NetConnection -ComputerName localhost -Port 1433
+            Write-Host "Testing connection to 127.0.0.1:1433"
+            Test-NetConnection -ComputerName 127.0.0.1 -Port 1433
+          shell: pwsh
+
         - name: Generate deploy script against Dev
           run: >
            sqlpackage
