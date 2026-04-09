@@ -15,7 +15,8 @@ jobs:
         - name: clean up temp files
           run: |
             if (Test-Path "C:\actions-runner\_work\_temp") {
-              Remove-Item -Recurse -Force "C:\actions-runner\_work\_temp\*" -ErrorAction SilentlyContinue}
+              Remove-Item -Recurse -Force "C:\actions-runner\_work\_temp\*" -ErrorAction SilentlyContinue
+              }
           shell: pwsh
 
         - name: Checkout code from github repository
