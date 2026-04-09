@@ -17,7 +17,7 @@ jobs:
             if (Test-Path "C:\actions-runner\_work\_temp") {
               Remove-Item -Recurse -Force "C:\actions-runner\_work\_temp\*" -ErrorAction SilentlyContinue
               }
-          shell: pwsh
+          shell: powershell
 
         - name: Checkout code from github repository
           uses: actions/checkout@v4
@@ -28,15 +28,15 @@ jobs:
             dotnet-version: 8.0.x
         - name: Restore tools
           run: dotnet tool restore
-          shell: pwsh
+          shell: powershell
 
         - name: Build SQL project
           run: dotnet build MyDatabaseProjectUno.sqlproj -c Debug
-          shell: pwsh
+          shell: powershell
         
         - name: Install SQLPackage
           run: dotnet tool install --global Microsoft.SqlPackage
-          shell: pwsh
+          shell: powershell
 
         
         - name: Check runner machine identity
@@ -44,13 +44,13 @@ jobs:
             Write-Host "Hostname: $env:COMPUTERNAME"
             Write-Host "Username: $env:USERNAME"
             ipconfig
-          shell: pwsh
+          shell: powershell
 
         - name: Test SQL Server connectivity
           run: |
             Write-Host "Testing connection to 10.0.0.4:1433"
             Test-NetConnection -ComputerName 10.0.0.4 -Port 1433
-          shell: pwsh
+          shell: powershell
 
         - name: Generate deploy script against Dev
           run: >
@@ -59,7 +59,7 @@ jobs:
            /SourceFile:"bin\Debug\MyDatabaseProjectUno.dacpac"
            /TargetConnectionString:"Server=${{ secrets.SQL_SERVER }};Database=${{ secrets.DEV_DB_NAME }};User ID=${{ secrets.SQL_USER }};Password=${{ secrets.SQL_PASSWORD }};Encrypt=True;TrustServerCertificate=True"
            /OutputPath:"deploy-script.sql"
-          shell: pwsh
+          shell: powershell
 
         - name: Upload dacpac
           uses: actions/upload-artifact@v4
