@@ -34,8 +34,6 @@ jobs:
           run: |
             Write-Host "Testing connection to 10.0.0.4:1433"
             Test-NetConnection -ComputerName 10.0.0.4 -Port 1433
-            Write-Host "Testing connection to 127.0.0.1:1433"
-            Test-NetConnection -ComputerName 127.0.0.1 -Port 1433
           shell: pwsh
 
         - name: Generate deploy script against Dev
