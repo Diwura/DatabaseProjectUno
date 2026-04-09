@@ -6,6 +6,7 @@ on:
         
 jobs:
     build-and-validate: # job_id
+     environment: dev
      name: Build and validate dacpac # job name
      runs-on: windows-latest
 
