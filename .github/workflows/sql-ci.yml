@@ -8,7 +8,7 @@ jobs:
     build-and-validate: # job_id
      environment: dev
      name: Build and validate dacpac # job name
-     runs-on: windows-latest
+     runs-on: self-hosted
 
      steps:
         - name: Checkout code from github repository
