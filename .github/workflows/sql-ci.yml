@@ -23,7 +23,7 @@ jobs:
           shell: pwsh
 
         - name: Build SQL project
-          run: dotnet build MyDatabaseProjectUno.sqlproj -c Release
+          run: dotnet build MyDatabaseProjectUno.sqlproj -c Debug
           shell: pwsh
         
         - name: Install SQLPackage
