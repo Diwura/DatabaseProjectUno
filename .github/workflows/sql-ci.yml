@@ -30,6 +30,14 @@ jobs:
           run: dotnet tool install --global Microsoft.SqlPackage
           shell: pwsh
 
+        
+        - name: Check runner machine identity
+          run: |
+            Write-Host "Hostname: $env:COMPUTERNAME"
+            Write-Host "Username: $env:USERNAME"
+            ipconfig
+          shell: pwsh
+
         - name: Test SQL Server connectivity
           run: |
             Write-Host "Testing connection to 10.0.0.4:1433"
