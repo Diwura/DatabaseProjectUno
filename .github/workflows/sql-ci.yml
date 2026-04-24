@@ -22,7 +22,7 @@ jobs:
           run:  |
             Start-Sleep -Seconds 5
             Get-ChildItem "C:\actions-runner\_work\_temp" | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
-          shell: pwsh
+          shell: powershell
         - name: Setup .Net
           uses: actions/setup-dotnet@v4
           with:
