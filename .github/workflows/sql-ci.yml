@@ -11,42 +11,18 @@ jobs:
      runs-on: self-hosted
 
      steps:
-
-        - name: clean up temp files
-          run: |
-            if (Test-Path "C:\actions-runner\_work\_temp") {
-              Remove-Item -Recurse -Force "C:\actions-runner\_work\_temp\*" -ErrorAction SilentlyContinue
-              }
-          shell: powershell
-
-        - name: clean up temp files
-          run: |
-            $tempPath = "C:\actions-runner\_work\_temp"
-            $maxAttempts = 3
-            $attempt = 0
-            
-            while ($attempt -lt $maxAttempts) {
-              try {
-                if (Test-Path $tempPath) {
-                  Get-ChildItem -Path $tempPath -Recurse -ErrorAction SilentlyContinue | 
-                    Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
-                  Remove-Item -Path $tempPath -Recurse -Force -ErrorAction SilentlyContinue
-                }
-                Write-Host "Cleanup successful"
-                break
-              }
-              catch {
-                $attempt++
-                Write-Host "Cleanup attempt $attempt failed, retrying..."
-                Start-Sleep -Seconds 2
-              }
-            }
-          shell: powershell
+        
         - name: Checkout code from github repository
           uses: actions/checkout@v4
           with:
             clean: false
+          continue-on-error: true
 
+        - name: Force cleanup temp
+          run:  |
+            Start-Sleep -Seconds 5
+            Get-ChildItem "C:\actions-runner\_work\_temp" | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+          shell: pwsh
         - name: Setup .Net
           uses: actions/setup-dotnet@v4
           with:
