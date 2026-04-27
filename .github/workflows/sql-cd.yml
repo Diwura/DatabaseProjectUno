@@ -32,6 +32,13 @@ jobs:
           run: dotnet tool restore
           shell: powershell
 
+        
+        - name: Clean leftover files
+          run: |
+            if (Test-Path "deploy-script.sql") {
+                Remove-Item "deploy-script.sql" -Force
+            }
+
         - name: Build SQL project
           run: dotnet build MyDatabaseProjectUno.sqlproj -c Debug
           shell: powershell
