@@ -75,7 +75,7 @@ jobs:
         environment: test
 
         steps:
-            - name: Download dacpac artifact
+            - name: Download dacpac artifact for test deployment
               uses: actions/download-artifact@v4
               with:
                 name: dacpac
@@ -96,7 +96,7 @@ jobs:
         environment: prod
 
         steps:
-            - name: Download dacpac artifact
+            - name: Download dacpac artifact for prod deployment
               uses: actions/download-artifact@v4
               with:
                 name: dacpac
