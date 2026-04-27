@@ -1,0 +1,111 @@
+name: SQL_CD
+
+
+on:
+    push:
+        branches: [ main ]
+
+jobs:
+    build_for_deploy: # job_id
+        runs-on: self-hosted
+        
+        
+        steps:
+        - name: Checkout code from github repository
+          uses: actions/checkout@v4
+          with:
+            clean: false
+          continue-on-error: true
+
+        - name: Force cleanup temp
+          run: |
+            Start-Sleep -Seconds 5
+            Get-ChildItem "C:\actions-runner\_work\_temp" | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+          shell: powershell
+
+        - name: Setup .Net
+          uses: actions/setup-dotnet@v4
+          with:
+            dotnet-version: 8.0.x
+        
+        - name: Restore tools
+          run: dotnet tool restore
+          shell: powershell
+
+        - name: Build SQL project
+          run: dotnet build MyDatabaseProjectUno.sqlproj -c Debug
+          shell: powershell
+
+        - name: Install SQLPackage
+          run: dotnet tool install --global Microsoft.SqlPackage
+          shell: powershell
+          
+        - name: upload dacpac artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: dacpac
+            path: bin\Debug\MyDatabaseProjectUno.dacpac
+        
+    
+    deploy_to_dev:
+        needs: build_for_deploy
+        runs-on: self-hosted
+        environment: dev
+
+        steps:
+            - name: Download dacpac artifact
+              uses: actions/download-artifact@v4
+              with:
+                name: dacpac
+                path: dacpac
+
+            - name: Publish to Dev
+              run: >
+                    sqlpackage
+                    /Action:Publish
+                    /SourceFile:"bin\Debug\MyDatabaseProjectUno.dacpac"
+                    /TargetConnectionString:"Server=${{ secrets.SQL_SERVER }};Database=${{ secrets.DEV_DB_NAME }};User ID=${{ secrets.SQL_USER }};Password=${{ secrets.SQL_PASSWORD }};Encrypt=True;TrustServerCertificate=True"
+                    
+              shell: powershell
+    
+
+    deploy_to_test:
+        needs: deploy_to_dev
+        runs-on: self-hosted
+        environment: test
+
+        steps:
+            - name: Download dacpac artifact
+              uses: actions/download-artifact@v4
+              with:
+                name: dacpac
+                path: dacpac
+            
+            - name: Publish to Test
+              run: >
+                    sqlpackage
+                    /Action:Publish
+                    /SourceFile:"bin\Debug\MyDatabaseProjectUno.dacpac"
+                    /TargetConnectionString:"Server=${{ secrets.SQL_SERVER }};Database=${{ secrets.TEST_DB_NAME }};User ID=${{ secrets.SQL_USER }};Password=${{ secrets.SQL_PASSWORD }};Encrypt=True;TrustServerCertificate=True"
+              shell: powershell
+
+        
+    deploy_to_prod:
+        needs: deploy_to_test
+        runs-on: self-hosted
+        environment: prod
+
+        steps:
+            - name: Download dacpac artifact
+              uses: actions/download-artifact@v4
+              with:
+                name: dacpac
+                path: dacpac
+            
+            - name: Publish to Prod
+              run: >
+                    sqlpackage
+                    /Action:Publish
+                    /SourceFile:"bin\Debug\MyDatabaseProjectUno.dacpac"
+                    /TargetConnectionString:"Server=${{ secrets.SQL_SERVER }};Database=${{ secrets.PROD_DB_NAME }};User ID=${{ secrets.SQL_USER }};Password=${{ secrets.SQL_PASSWORD }};Encrypt=True;TrustServerCertificate=True"
+              shell: powershell
